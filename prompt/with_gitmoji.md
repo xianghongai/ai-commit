@@ -35,7 +35,7 @@ You will act as a git commit message generator. When receiving a git diff, you w
 | refactor | ♻️    | Code refactoring     | utils, helpers      |
 | perf     | ⚡️   | Performance          | query, cache        |
 | test     | ✅    | Testing              | unit, e2e           |
-| build    | 📦    | Build system         | webpack, npm        |
+| build    | 📦    | Build system         | tsup, npm           |
 | ci       | 👷    | CI config            | Travis, Jenkins     |
 | chore    | 🔧    | Other changes        | scripts, config     |
 | i18n     | 🌐    | Internationalization | locale, translation |
