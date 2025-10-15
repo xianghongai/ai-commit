@@ -1,87 +1,81 @@
+import * as fs from 'fs-extra';
+import * as path from 'path';
+import * as os from 'os';
 import { ConfigKeys, ConfigurationManager } from './config';
 
-/**
- * Initializes the main prompt for generating commit messages.
- *
- * @param {string} language - The language to be used in the prompt.
- * @returns {Object} - The main prompt object containing role and content.
- */
-const INIT_MAIN_PROMPT = (language: string) => ({
-  role: 'system',
-  content:
-    ConfigurationManager.getInstance().getConfig<string>(ConfigKeys.SYSTEM_PROMPT) ||
-    `# Git Commit Message Guide
+// Map user-friendly flavor names to actual file names
+function mapFlavorToFilename(flavor: string): string {
+  const flavorMap: Record<string, string> = {
+    'Conventional Commits': 'without_gitmoji.md',
+    'Conventional Commits with Gitmoji': 'with_gitmoji.md',
+    // Backward compatibility for old config values
+    without_gitmoji: 'without_gitmoji.md',
+    with_gitmoji: 'with_gitmoji.md',
+  };
+  return flavorMap[flavor] || 'without_gitmoji.md';
+}
 
-## Role and Purpose
+// Load prompt content from prompt directory based on flavor
+function loadPromptFromBundle(): string {
+  // try external file first
+  const external = loadExternalPromptFile();
+  if (external) {
+    return external;
+  }
 
-You will act as a git commit message generator. When receiving a git diff, you will ONLY output the commit message itself, nothing else. No explanations, no questions, no additional comments.
+  // fallback to bundled flavor
+  const flavor =
+    (vscodeWorkspaceGet('ai-commit.PROMPT_FLAVOR', 'Conventional Commits') as string) || 'Conventional Commits';
+  const filename = mapFlavorToFilename(flavor);
+  const full = path.join(__dirname, '..', 'prompt', filename);
+  try {
+    return fs.readFileSync(full, 'utf8');
+  } catch {
+    // Fallback minimal prompt
+    return 'You are a git commit message generator. Output only the commit message.';
+  }
+}
 
-## Output Format
+function vscodeWorkspaceGet<T>(key: string, defaultValue: T): T {
+  // Lazy import to avoid circular
+  const vscode = require('vscode') as typeof import('vscode');
+  return vscode.workspace.getConfiguration().get<T>(key, defaultValue);
+}
 
-### Single Type Changes
+function expandPath(p: string): string {
+  if (!p) {
+    return p;
+  }
+  // expand env vars: ${env:VAR}
+  p = p.replace(/\$\{env:([A-Z0-9_]+)\}/gi, (_, name) => process.env[name] ?? '');
+  // expand home ~ at start
+  if (p.startsWith('~')) {
+    p = path.join(os.homedir(), p.slice(1));
+  }
+  return p;
+}
 
-\`\`\`
-<type>(<scope>): <subject>
-  <body>
-\`\`\`
+function loadExternalPromptFile(): string | undefined {
+  const file = vscodeWorkspaceGet('ai-commit.PROMPT_FILE', '') as string;
+  if (!file || !String(file).trim()) {
+    return undefined;
+  }
+  const full = expandPath(file.trim());
+  try {
+    if (fs.existsSync(full)) {
+      return fs.readFileSync(full, 'utf8');
+    }
+  } catch {
+    // ignore
+  }
+  return undefined;
+}
 
-
-## Type Reference
-
-| Type     | Description          | Example Scopes      |
-| -------- | -------------------- | ------------------- |
-| feat     | New feature          | user, payment       |
-| fix      | Bug fix              | auth, data          |
-| docs     | Documentation        | README, API         |
-| style    | Code style           | formatting          |
-| refactor | Code refactoring     | utils, helpers      |
-| perf     | Performance          | query, cache        |
-| test     | Testing              | unit, e2e           |
-| build    | Build system         | tsup, npm           |
-| ci       | CI config            | Travis, Jenkins     |
-| chore    | Other changes        | scripts, config     |
-| i18n     | Internationalization | locale, translation |
-
-## Writing Rules
-
-### Subject Line
-
-- Scope must be in English
-- Imperative mood
-- No capitalization
-- No period at end
-- Max 50 characters
-- Must be in ${language}
-
-### Body
-
-- Bullet points with "-"
-- Max 72 chars per line
-- Explain what and why
-- Must be in ${language}
-- Use【】for different types
-
-## Critical Requirements
-
-1. Output ONLY the commit message
-2. Write ONLY in ${language}
-3. NO additional text or explanations
-4. NO questions or comments
-5. NO formatting instructions or metadata
-
-Remember: All output MUST be in ${language} language. You are to act as a pure commit message generator. Your response should contain NOTHING but the commit message itself.
-
-No reasoning.`
-});
-
-/**
- * Retrieves the main commit prompt.
- *
- * @returns {Promise<Array<Object>>} - A promise that resolves to an array of prompts.
- */
 export const getMainCommitPrompt = async () => {
-  const language = ConfigurationManager.getInstance().getConfig<string>(
-    ConfigKeys.AI_COMMIT_LANGUAGE
-  );
-  return [INIT_MAIN_PROMPT(language)];
+  const language = ConfigurationManager.getInstance().getConfig<string>(ConfigKeys.AI_COMMIT_LANGUAGE);
+  let base = loadPromptFromBundle();
+  // Replace placeholders
+  base = base.replace(/\{\{LANG\}\}/g, language);
+  const supplement = `\n\nRemember: All output MUST be in ${language} language. Your response must contain NOTHING but the commit message itself.`;
+  return [{ role: 'system', content: `${base}${supplement}` }];
 };

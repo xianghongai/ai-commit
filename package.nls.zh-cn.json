@@ -1,0 +1,14 @@
+{
+  "displayName": "AI 提交",
+  "description": "使用 AI 生成符合约定的规范提交消息",
+  "command.aiCommit": "AI 提交",
+  "command.switchProvider": "AI 提交：切换提供商/模型",
+  "config.title": "AI 提交",
+  "config.language.description": "提交消息语言",
+  "config.providers.description": "LLM 提供商/模型列表",
+  "config.activeProviderId.description": "从 ai-commit.providers 中选择使用哪个提供商",
+  "config.promptFlavor.description": "使用内置 prompt 目录中的哪个提示词模板",
+  "config.promptFlavor.conventional": "标准的常规提交格式",
+  "config.promptFlavor.conventionalWithGitmoji": "带 gitmoji 表情符号前缀的常规提交",
+  "config.promptFile.description": "自定义提示词文件的绝对路径；如果设置，将覆盖 flavor 和目录设置"
+}

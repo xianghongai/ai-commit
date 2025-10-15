@@ -1,0 +1,14 @@
+{
+  "displayName": "AI Commit",
+  "description": "Use AI to generate conventional commit messages that meet the conventions",
+  "command.aiCommit": "AI Commit",
+  "command.switchProvider": "AI Commit: Switch Provider/Model",
+  "config.title": "AI Commit",
+  "config.language.description": "Commit message language",
+  "config.providers.description": "List of LLM providers/models",
+  "config.activeProviderId.description": "Which provider to use from ai-commit.providers",
+  "config.promptFlavor.description": "Which prompt template to use from the bundled prompt directory",
+  "config.promptFlavor.conventional": "Standard conventional commits format",
+  "config.promptFlavor.conventionalWithGitmoji": "Conventional commits with gitmoji emoji prefix",
+  "config.promptFile.description": "Absolute path to a custom prompt file; if set, overrides flavor and directory"
+}

@@ -1,10 +1,9 @@
 {
-  "name": "ai-commit",
-  "displayName": "AI Commit",
-  "description": "Use Azure/OpenAI API to review Git changes, generate conventional commit messages that meet the conventions, simplify the commit process, and keep the commit conventions consistent.",
-  "version": "0.1.2",
+  "name": "vscode-ai-commit",
+  "displayName": "AI Commit++",
+  "description": "%description%",
+  "version": "1.0.0",
   "engines": {
-    "node": ">=16",
     "vscode": "^1.77.0"
   },
   "categories": [
@@ -23,8 +22,8 @@
     "AI Commit",
     "Auto Commit"
   ],
-  "publisher": "Nicholas Hsiang",
-  "repository": "https://github.com/xianghongai/ai-commit",
+  "publisher": "NicholasHsiang",
+  "repository": "https://github.com/xianghongai/vscode-ai-commit",
   "icon": "images/logo.png",
   "activationEvents": [
     "onCommand:ai-commit"
@@ -37,18 +36,18 @@
           "dark": "images/icon.svg",
           "light": "images/icon-gray.svg"
         },
-        "title": "AI Commit"
+        "title": "%command.aiCommit%"
       },
       {
-        "command": "ai-commit.showAvailableModels",
-        "title": "Show Available OpenAI Models"
+        "command": "ai-commit.switchProvider",
+        "title": "%command.switchProvider%"
       }
     ],
     "configuration": {
       "properties": {
         "ai-commit.AI_COMMIT_LANGUAGE": {
           "default": "English",
-          "description": "Commit message language",
+          "description": "%config.language.description%",
           "enum": [
             "Simplified Chinese",
             "Traditional Chinese",
@@ -93,72 +92,131 @@
           ],
           "type": "string"
         },
-        "ai-commit.AZURE_API_VERSION": {
-          "default": "",
-          "description": "AZURE API VERSION",
-          "type": "string"
+        "ai-commit.providers": {
+          "type": "array",
+          "description": "%config.providers.description%",
+          "default": [],
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "displayName": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "openai",
+                  "openai-compatible",
+                  "openrouter",
+                  "gemini",
+                  "azure-openai",
+                  "ollama"
+                ]
+              },
+              "model": {
+                "type": "string"
+              },
+              "modelKind": {
+                "type": "string",
+                "enum": [
+                  "chat"
+                ]
+              },
+              "baseUrl": {
+                "type": "string"
+              },
+              "endpoint": {
+                "type": "string"
+              },
+              "deployment": {
+                "type": "string"
+              },
+              "apiKey": {
+                "type": "string"
+              },
+              "apiVersion": {
+                "type": "string"
+              },
+              "organization": {
+                "type": "string"
+              },
+              "headers": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string"
+                }
+              },
+              "timeoutMs": {
+                "type": "number"
+              },
+              "params": {
+                "type": "object",
+                "properties": {
+                  "temperature": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 2
+                  },
+                  "top_p": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  },
+                  "maxTokens": {
+                    "type": "number",
+                    "minimum": 1
+                  }
+                },
+                "additionalProperties": true
+              }
+            },
+            "required": [
+              "id",
+              "type",
+              "model"
+            ]
+          }
         },
-        "ai-commit.OPENAI_API_KEY": {
-          "default": "",
-          "description": "OpenAI API Key",
-          "type": "string"
-        },
-        "ai-commit.OPENAI_BASE_URL": {
-          "default": "",
-          "description": "OpenAI BASE URL",
-          "type": "string"
-        },
-        "ai-commit.OPENAI_MODEL": {
-          "default": "gpt-4o",
-          "description": "OpenAI MODEL, you can select a model from the list by running the 'Show Available OpenAI Models' command",
-          "type": "string"
-        },
-        "ai-commit.AI_COMMIT_SYSTEM_PROMPT": {
+        "ai-commit.activeProviderId": {
           "type": "string",
           "default": "",
-          "description": "Custom system prompt for generating commit messages"
+          "description": "%config.activeProviderId.description%"
         },
-        "ai-commit.OPENAI_TEMPERATURE": {
-          "type": "number",
-          "default": 0.7,
-          "minimum": 0,
-          "maximum": 2,
-          "description": "OpenAI temperature setting (0-2). Higher values make output more random, lower values more deterministic."
-        },
-        "ai-commit.AI_PROVIDER": {
+        "ai-commit.PROMPT_FLAVOR": {
           "type": "string",
-          "default": "openai",
-          "description": "AI Provider to use (OpenAI or Gemini)",
+          "default": "Conventional Commits",
           "enum": [
-            "openai",
-            "gemini"
-          ]
+            "Conventional Commits",
+            "Conventional Commits with Gitmoji"
+          ],
+          "enumDescriptions": [
+            "%config.promptFlavor.conventional%",
+            "%config.promptFlavor.conventionalWithGitmoji%"
+          ],
+          "description": "%config.promptFlavor.description%"
         },
-        "ai-commit.GEMINI_API_KEY": {
+        "ai-commit.PROMPT_FILE": {
           "type": "string",
           "default": "",
-          "description": "Gemini API Key"
-        },
-        "ai-commit.GEMINI_MODEL": {
-          "type": "string",
-          "default": "gemini-2.0-flash-001",
-          "description": "Gemini Model to use"
-        },
-        "ai-commit.GEMINI_TEMPERATURE": {
-          "type": "number",
-          "default": 0.7,
-          "minimum": 0,
-          "maximum": 2,
-          "description": "Gemini temperature setting (0-2). Controls randomness."
+          "description": "%config.promptFile.description%"
         }
       },
-      "title": "AI Commit"
+      "title": "%config.title%"
     },
     "menus": {
       "scm/title": [
         {
           "command": "extension.ai-commit",
           "group": "navigation"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "ai-commit.switchProvider",
+          "when": "true"
         }
       ]
     }
@@ -168,7 +226,7 @@
     "build": "tsup --config tsup.config.ts --minify",
     "compile": "tsup --config tsup.config.ts",
     "compile-tests": "tsc -p . --outDir out",
-    "lint": "eslint src --ext ts",
+    "lint": "eslint src",
     "package": "vsce package --no-dependencies",
     "pretest": "npm run compile-tests && npm run compile && npm run lint",
     "publish": "vsce publish --no-dependencies",
@@ -181,17 +239,18 @@
     "@types/fs-extra": "^11.0.4",
     "@types/glob": "^8.1.0",
     "@types/mocha": "^10.0.1",
-    "@types/node": "16.x",
+    "@types/node": "^20",
     "@types/vscode": "^1.0.0",
-    "@typescript-eslint/eslint-plugin": "^5.56.0",
-    "@typescript-eslint/parser": "^5.56.0",
+    "@typescript-eslint/eslint-plugin": "^8.46.1",
+    "@typescript-eslint/parser": "^8.46.1",
     "@vscode/test-electron": "^2.3.0",
     "@vscode/vsce": "^3.6.0",
-    "eslint": "^8.36.0",
+    "eslint": "^9.37.0",
     "glob": "^8.1.0",
     "mocha": "^10.2.0",
-    "typescript": "^4.9.5",
-    "tsup": "^8.1.0"
+    "tsup": "^8.1.0",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.46.1"
   },
   "dependencies": {
     "@google/generative-ai": "^0.21.0",
@@ -199,8 +258,5 @@
     "openai": "^4.14.2",
     "simple-git": "^3.17.0"
   },
-  "resolutions": {
-    "@types/node": "16.x"
-  },
   "license": "MIT"
-};
+}

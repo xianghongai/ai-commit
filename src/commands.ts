@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import { generateCommitMsg } from './generate-commit-msg';
-import { ConfigurationManager } from './config';
+import { ProviderRegistry } from './providers/registry';
+import { I18n } from './i18n';
 
 /**
  * Manages the registration and disposal of commands.
@@ -16,24 +17,31 @@ export class CommandManager {
       vscode.commands.executeCommand('workbench.action.openSettings', 'ai-commit')
     );
 
-    // Show available OpenAI models
-    this.registerCommand('ai-commit.showAvailableModels', async () => {
-      const configManager = ConfigurationManager.getInstance();
-      const models = await configManager.getAvailableOpenAIModels();
-      const selected = await vscode.window.showQuickPick(models, {
-        placeHolder: 'Please select a model'
-      });
-      
-      if (selected) {
-        const config = vscode.workspace.getConfiguration('ai-commit');
-        await config.update('OPENAI_MODEL', selected, vscode.ConfigurationTarget.Global);
+    // Switch active provider (vendor/model)
+    this.registerCommand('ai-commit.switchProvider', async () => {
+      const providers = ProviderRegistry.getProviders();
+      if (!providers.length) {
+        vscode.window.showWarningMessage(I18n.t('error.noProvidersForSwitch'));
+        return;
+      }
+      const activeId = ProviderRegistry.getActiveProviderId();
+      const items = providers.map((p) => ({
+        label: p.displayName || p.id,
+        description: `${p.type} · ${p.model}`,
+        picked: p.id === activeId,
+        id: p.id,
+      }));
+      const pick = await vscode.window.showQuickPick(items, { placeHolder: I18n.t('picker.selectProvider') });
+      if (pick) {
+        await ProviderRegistry.setActiveProviderId(pick.id);
+        vscode.window.showInformationMessage(I18n.t('info.providerSet', pick.label));
       }
     });
 
     /**
      * @deprecated
      * This function is deprecated because Gemini API does not currently support listing models via API.
-     * 
+     *
      * Show available Gemini models
      */
     /*
@@ -58,18 +66,15 @@ export class CommandManager {
         await handler(...args);
       } catch (error) {
         const result = await vscode.window.showErrorMessage(
-          `Failed: ${error.message}`,
-          'Retry',
-          'Configure'
+          `${I18n.t('status.failed')}: ${error.message}`,
+          I18n.t('button.retry'),
+          I18n.t('button.configure')
         );
 
-        if (result === 'Retry') {
+        if (result === I18n.t('button.retry')) {
           await handler(...args);
-        } else if (result === 'Configure') {
-          await vscode.commands.executeCommand(
-            'workbench.action.openSettings',
-            'ai-commit'
-          );
+        } else if (result === I18n.t('button.configure')) {
+          await vscode.commands.executeCommand('workbench.action.openSettings', 'ai-commit');
         }
       }
     });
