@@ -28,3 +28,9 @@ node_modules
 .vscode-test/
 *.vsix
 temp
+.env
+.env.*
+coverage/
+.idea/
+*.tmp
+*.swp

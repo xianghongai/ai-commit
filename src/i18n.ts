@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 
 /**
  * Manages internationalization for the extension UI.
- * Note: This is separate from the commit message language (AI_COMMIT_LANGUAGE).
+ * Note: This is separate from the commit message language (ai-commit.commitLanguage).
  */
 export class I18n {
   private static messages: Record<string, Record<string, string>> = {

@@ -80,7 +80,7 @@
     }
   ],
   "ai-commit.activeProviderId": "siliconflow-qwen",
-  "ai-commit.AI_COMMIT_LANGUAGE": "Simplified Chinese"
+  "ai-commit.commitLanguage": "Simplified Chinese"
 }
 ```
 

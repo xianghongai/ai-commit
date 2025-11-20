@@ -2,7 +2,7 @@
   "name": "vscode-ai-commit",
   "displayName": "AI Commit++",
   "description": "%description%",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "engines": {
     "vscode": "^1.77.0"
   },
@@ -45,9 +45,10 @@
     ],
     "configuration": {
       "properties": {
-        "ai-commit.AI_COMMIT_LANGUAGE": {
+        "ai-commit.commitLanguage": {
           "default": "English",
           "description": "%config.language.description%",
+          "markdownDescription": "%config.language.markdown%",
           "enum": [
             "Simplified Chinese",
             "Traditional Chinese",
@@ -185,7 +186,7 @@
           "default": "",
           "description": "%config.activeProviderId.description%"
         },
-        "ai-commit.PROMPT_FLAVOR": {
+        "ai-commit.promptFlavor": {
           "type": "string",
           "default": "Conventional Commits",
           "enum": [
@@ -196,12 +197,14 @@
             "%config.promptFlavor.conventional%",
             "%config.promptFlavor.conventionalWithGitmoji%"
           ],
-          "description": "%config.promptFlavor.description%"
+          "description": "%config.promptFlavor.description%",
+          "markdownDescription": "%config.promptFlavor.markdown%"
         },
-        "ai-commit.PROMPT_FILE": {
+        "ai-commit.promptFile": {
           "type": "string",
           "default": "",
-          "description": "%config.promptFile.description%"
+          "description": "%config.promptFile.description%",
+          "markdownDescription": "%config.promptFile.markdown%"
         }
       },
       "title": "%config.title%"

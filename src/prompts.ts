@@ -25,7 +25,7 @@ function loadPromptFromBundle(): string {
 
   // fallback to bundled flavor
   const flavor =
-    (vscodeWorkspaceGet('ai-commit.PROMPT_FLAVOR', 'Conventional Commits') as string) || 'Conventional Commits';
+    (vscodeWorkspaceGet('ai-commit.promptFlavor', 'Conventional Commits') as string) || 'Conventional Commits';
   const filename = mapFlavorToFilename(flavor);
   const full = path.join(__dirname, '..', 'prompt', filename);
   try {
@@ -39,7 +39,9 @@ function loadPromptFromBundle(): string {
 function vscodeWorkspaceGet<T>(key: string, defaultValue: T): T {
   // Lazy import to avoid circular
   const vscode = require('vscode') as typeof import('vscode');
-  return vscode.workspace.getConfiguration().get<T>(key, defaultValue);
+  const config = vscode.workspace.getConfiguration();
+  const value = config.get<T>(key, defaultValue);
+  return value ?? defaultValue;
 }
 
 function expandPath(p: string): string {
@@ -56,7 +58,7 @@ function expandPath(p: string): string {
 }
 
 function loadExternalPromptFile(): string | undefined {
-  const file = vscodeWorkspaceGet('ai-commit.PROMPT_FILE', '') as string;
+  const file = vscodeWorkspaceGet('ai-commit.promptFile', '') as string;
   if (!file || !String(file).trim()) {
     return undefined;
   }
@@ -72,7 +74,8 @@ function loadExternalPromptFile(): string | undefined {
 }
 
 export const getMainCommitPrompt = async () => {
-  const language = ConfigurationManager.getInstance().getConfig<string>(ConfigKeys.AI_COMMIT_LANGUAGE);
+  const language =
+    ConfigurationManager.getInstance().getConfig<string>(ConfigKeys.COMMIT_LANGUAGE, 'English') ?? 'English';
   let base = loadPromptFromBundle();
   // Replace placeholders
   base = base.replace(/\{\{LANG\}\}/g, language);

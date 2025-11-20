@@ -4,10 +4,10 @@ import * as vscode from 'vscode';
 /**
  * Configuration keys used in the AI commit extension.
  * @constant {Object}
- * @property {string} AI_COMMIT_LANGUAGE - The language for AI commit messages.
+ * @property {string} COMMIT_LANGUAGE - The language for AI commit messages.
  */
 export enum ConfigKeys {
-  AI_COMMIT_LANGUAGE = 'AI_COMMIT_LANGUAGE',
+  COMMIT_LANGUAGE = 'commitLanguage',
 }
 
 /**
@@ -40,7 +40,8 @@ export class ConfigurationManager {
   getConfig<T>(key: string, defaultValue?: T): T {
     if (!this.configCache.has(key)) {
       const config = vscode.workspace.getConfiguration('ai-commit');
-      this.configCache.set(key, config.get<T>(key, defaultValue));
+      const value = config.get<T>(key, defaultValue);
+      this.configCache.set(key, value as T);
     }
     return this.configCache.get(key);
   }

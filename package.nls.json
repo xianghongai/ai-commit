@@ -5,10 +5,13 @@
   "command.switchProvider": "AI Commit: Switch Provider/Model",
   "config.title": "AI Commit",
   "config.language.description": "Commit message language",
+  "config.language.markdown": "Sets the language used for AI-generated commit messages. The same value replaces {{LANG}} inside prompt templates so guidance and bodies stay localized.",
   "config.providers.description": "List of LLM providers/models",
   "config.activeProviderId.description": "Which provider to use from ai-commit.providers",
   "config.promptFlavor.description": "Which prompt template to use from the bundled prompt directory",
   "config.promptFlavor.conventional": "Standard conventional commits format",
   "config.promptFlavor.conventionalWithGitmoji": "Conventional commits with gitmoji emoji prefix",
-  "config.promptFile.description": "Absolute path to a custom prompt file; if set, overrides flavor and directory"
+  "config.promptFlavor.markdown": "Switch between the default Conventional Commit prompt and the Gitmoji-enhanced variant. Both prompts still honor the selected commit language.",
+  "config.promptFile.description": "Absolute path to a custom prompt file; if set, overrides flavor and directory",
+  "config.promptFile.markdown": "Provide an absolute path to your own prompt. When specified it replaces the bundled templates, so ensure it still enforces Conventional Commits and references {{LANG}} for localization."
 }

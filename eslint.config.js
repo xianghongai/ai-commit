@@ -3,7 +3,7 @@ const tseslint = require('typescript-eslint');
 module.exports = [
   {
     // 忽略的文件和目录
-    ignores: ['out/**', 'dist/**', '**/*.d.ts'],
+    ignores: ['out/**', 'dist/**', 'node_modules/**', '**/*.d.ts'],
   },
   ...tseslint.configs.recommended.map((config) => ({
     ...config,

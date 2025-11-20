@@ -5,10 +5,13 @@
   "command.switchProvider": "AI 提交：切换提供商/模型",
   "config.title": "AI 提交",
   "config.language.description": "提交消息语言",
+  "config.language.markdown": "设置 AI 生成提交消息时使用的语言，并将同样的值替换 prompt 模板中的 {{LANG}}，确保指令与正文保持本地化。",
   "config.providers.description": "LLM 提供商/模型列表",
   "config.activeProviderId.description": "从 ai-commit.providers 中选择使用哪个提供商",
   "config.promptFlavor.description": "使用内置 prompt 目录中的哪个提示词模板",
   "config.promptFlavor.conventional": "标准的常规提交格式",
   "config.promptFlavor.conventionalWithGitmoji": "带 gitmoji 表情符号前缀的常规提交",
-  "config.promptFile.description": "自定义提示词文件的绝对路径；如果设置，将覆盖 flavor 和目录设置"
+  "config.promptFlavor.markdown": "在标准 Conventional Commit 模板与 Gitmoji 版本之间切换；无论哪种模板都会应用所选语言。",
+  "config.promptFile.description": "自定义提示词文件的绝对路径；如果设置，将覆盖 flavor 和目录设置",
+  "config.promptFile.markdown": "指定自定义 prompt 的绝对路径。设置后会替换内置模板，因此需确保仍符合 Conventional Commits 并继续引用 {{LANG}} 占位符。"
 }
