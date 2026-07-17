@@ -1,84 +1,65 @@
 import * as fs from 'fs-extra';
-import * as path from 'path';
 import * as os from 'os';
+import * as path from 'path';
+import * as vscode from 'vscode';
 import { ConfigKeys, ConfigurationManager } from './config';
+import { I18n } from './i18n';
+import { getErrorMessage } from './providers/shared';
+import type { ChatMessage } from './providers/types';
 
-// Map user-friendly flavor names to actual file names
-function mapFlavorToFilename(flavor: string): string {
-  const flavorMap: Record<string, string> = {
-    'Conventional Commits': 'without_gitmoji.md',
-    'Conventional Commits with Gitmoji': 'with_gitmoji.md',
-    // Backward compatibility for old config values
-    without_gitmoji: 'without_gitmoji.md',
-    with_gitmoji: 'with_gitmoji.md',
-  };
-  return flavorMap[flavor] || 'without_gitmoji.md';
-}
+const FLAVOR_FILES: Record<string, string> = {
+  'Conventional Commits': 'without_gitmoji.md',
+  'Conventional Commits with Gitmoji': 'with_gitmoji.md',
+  // 兼容旧版本已写入 settings 的 flavor 值；用户迁移完成后仍可长期无害保留。
+  without_gitmoji: 'without_gitmoji.md',
+  with_gitmoji: 'with_gitmoji.md',
+};
 
-// Load prompt content from prompt directory based on flavor
-function loadPromptFromBundle(): string {
-  // try external file first
-  const external = loadExternalPromptFile();
-  if (external) {
-    return external;
-  }
-
-  // fallback to bundled flavor
-  const flavor =
-    (vscodeWorkspaceGet('ai-commit.promptFlavor', 'Conventional Commits') as string) || 'Conventional Commits';
-  const filename = mapFlavorToFilename(flavor);
-  const full = path.join(__dirname, '..', 'prompt', filename);
-  try {
-    return fs.readFileSync(full, 'utf8');
-  } catch {
-    // Fallback minimal prompt
-    return 'You are a git commit message generator. Output only the commit message.';
-  }
-}
-
-function vscodeWorkspaceGet<T>(key: string, defaultValue: T): T {
-  // Lazy import to avoid circular
-  const vscode = require('vscode') as typeof import('vscode');
-  const config = vscode.workspace.getConfiguration();
-  const value = config.get<T>(key, defaultValue);
-  return value ?? defaultValue;
-}
-
-function expandPath(p: string): string {
-  if (!p) {
-    return p;
-  }
-  // expand env vars: ${env:VAR}
-  p = p.replace(/\$\{env:([A-Z0-9_]+)\}/gi, (_, name) => process.env[name] ?? '');
-  // expand home ~ at start
-  if (p.startsWith('~')) {
-    p = path.join(os.homedir(), p.slice(1));
-  }
-  return p;
-}
-
-function loadExternalPromptFile(): string | undefined {
-  const file = vscodeWorkspaceGet('ai-commit.promptFile', '') as string;
-  if (!file || !String(file).trim()) {
-    return undefined;
-  }
-  const full = expandPath(file.trim());
-  try {
-    if (fs.existsSync(full)) {
-      return fs.readFileSync(full, 'utf8');
+/** 读取自定义或内置 Prompt；显式自定义文件失败时不允许静默降级。 */
+function loadMainPrompt(): string {
+  const config = vscode.workspace.getConfiguration('ai-commit');
+  const promptFile = config.get<string>('promptFile', '').trim();
+  if (promptFile) {
+    const fullPath = expandPath(promptFile);
+    try {
+      return fs.readFileSync(fullPath, 'utf8');
+    } catch (error) {
+      throw new Error(I18n.t('error.customPromptRead', fullPath, getErrorMessage(error, 'Unknown error')), {
+        cause: error,
+      });
     }
-  } catch {
-    // ignore
   }
-  return undefined;
+
+  const flavor = config.get<string>('promptFlavor', 'Conventional Commits');
+  const filename = FLAVOR_FILES[flavor] ?? FLAVOR_FILES['Conventional Commits'];
+  const fullPath = path.join(__dirname, '..', 'prompt', filename);
+  try {
+    return fs.readFileSync(fullPath, 'utf8');
+  } catch (error) {
+    throw new Error(I18n.t('error.bundledPromptRead', filename), { cause: error });
+  }
 }
 
-export const getMainCommitPrompt = async () => {
+/** 展开 Prompt 路径中契约允许的环境变量与用户主目录前缀。 */
+function expandPath(value: string): string {
+  const expandedEnvironment = value.replace(
+    /\$\{env:([A-Z0-9_]+)\}/gi,
+    (_match, name: string) => process.env[name] ?? ''
+  );
+  if (expandedEnvironment === '~') {
+    return os.homedir();
+  }
+  if (expandedEnvironment.startsWith('~/')) {
+    return path.join(os.homedir(), expandedEnvironment.slice(2));
+  }
+  return expandedEnvironment;
+}
+
+/** 返回带语言约束的 system 消息。 */
+export async function getMainCommitPrompt(): Promise<ChatMessage[]> {
   const language =
     ConfigurationManager.getInstance().getConfig<string>(ConfigKeys.COMMIT_LANGUAGE, 'English') ?? 'English';
-  let base = loadPromptFromBundle();
-  // Replace placeholders
-  base = base.replace(/\{\{LANG\}\}/g, language);
+  const base = loadMainPrompt().replace(/\{\{LANG\}\}/g, language);
   const supplement = `\n\nRemember: All output MUST be in ${language} language. Your response must contain NOTHING but the commit message itself.`;
   return [{ role: 'system', content: `${base}${supplement}` }];
-};
+}

@@ -3,8 +3,10 @@
   "displayName": "AI Commit++",
   "description": "%description%",
   "version": "1.0.2",
+  "packageManager": "pnpm@11.13.0",
   "engines": {
-    "vscode": "^1.77.0"
+    "node": ">=22.12.0",
+    "vscode": "^1.92.0"
   },
   "categories": [
     "Other"
@@ -22,12 +24,42 @@
     "AI Commit",
     "Auto Commit"
   ],
+  "license": "MIT",
   "publisher": "NicholasHsiang",
   "repository": "https://github.com/xianghongai/vscode-ai-commit",
   "icon": "images/logo.png",
-  "activationEvents": [
-    "onCommand:ai-commit"
-  ],
+  "main": "./dist/extension.js",
+  "scripts": {
+    "build": "tsup --config tsup.config.ts --minify",
+    "compile": "tsup --config tsup.config.ts",
+    "compile-tests": "tsc -p . --outDir out",
+    "lint": "eslint src",
+    "package": "vsce package --no-dependencies",
+    "pretest": "pnpm run compile-tests && pnpm run compile && pnpm run lint",
+    "publish": "vsce publish --no-dependencies",
+    "test": "node --test ./out/test/provider-config.test.js ./out/test/provider-adapters.test.js ./out/test/repository-utils.test.js",
+    "vscode:prepublish": "pnpm run build",
+    "watch": "tsup --config tsup.config.ts --watch",
+    "watch-tests": "tsc -p . -w --outDir out"
+  },
+  "devDependencies": {
+    "@types/fs-extra": "^11.0.4",
+    "@types/node": "^20",
+    "@types/vscode": "^1.92.0",
+    "@typescript-eslint/eslint-plugin": "^8.46.1",
+    "@typescript-eslint/parser": "^8.46.1",
+    "@vscode/vsce": "^3.6.0",
+    "eslint": "^9.37.0",
+    "tsup": "^8.1.0",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.46.1"
+  },
+  "dependencies": {
+    "@google/genai": "^2.12.0",
+    "fs-extra": "^11.0.4",
+    "openai": "^4.14.2",
+    "simple-git": "^3.17.0"
+  },
   "contributes": {
     "commands": [
       {
@@ -151,7 +183,9 @@
                 }
               },
               "timeoutMs": {
-                "type": "number"
+                "type": "number",
+                "minimum": 1,
+                "default": 120000
               },
               "params": {
                 "type": "object",
@@ -171,13 +205,49 @@
                     "minimum": 1
                   }
                 },
-                "additionalProperties": true
+                "additionalProperties": false
               }
             },
+            "additionalProperties": false,
             "required": [
               "id",
               "type",
               "model"
+            ],
+            "allOf": [
+              {
+                "if": {
+                  "properties": {
+                    "type": {
+                      "enum": [
+                        "openai-compatible",
+                        "openrouter"
+                      ]
+                    }
+                  }
+                },
+                "then": {
+                  "required": [
+                    "baseUrl"
+                  ]
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "type": {
+                      "const": "azure-openai"
+                    }
+                  }
+                },
+                "then": {
+                  "required": [
+                    "endpoint",
+                    "apiVersion",
+                    "deployment"
+                  ]
+                }
+              }
             ]
           }
         },
@@ -223,43 +293,5 @@
         }
       ]
     }
-  },
-  "main": "./dist/extension.js",
-  "scripts": {
-    "build": "tsup --config tsup.config.ts --minify",
-    "compile": "tsup --config tsup.config.ts",
-    "compile-tests": "tsc -p . --outDir out",
-    "lint": "eslint src",
-    "package": "vsce package --no-dependencies",
-    "pretest": "npm run compile-tests && npm run compile && npm run lint",
-    "publish": "vsce publish --no-dependencies",
-    "test": "node ./out/test/runTest.js",
-    "vscode:prepublish": "npm run build",
-    "watch": "tsup --config tsup.config.ts --watch",
-    "watch-tests": "tsc -p . -w --outDir out"
-  },
-  "devDependencies": {
-    "@types/fs-extra": "^11.0.4",
-    "@types/glob": "^8.1.0",
-    "@types/mocha": "^10.0.1",
-    "@types/node": "^20",
-    "@types/vscode": "^1.0.0",
-    "@typescript-eslint/eslint-plugin": "^8.46.1",
-    "@typescript-eslint/parser": "^8.46.1",
-    "@vscode/test-electron": "^2.3.0",
-    "@vscode/vsce": "^3.6.0",
-    "eslint": "^9.37.0",
-    "glob": "^8.1.0",
-    "mocha": "^10.2.0",
-    "tsup": "^8.1.0",
-    "typescript": "^5.9.3",
-    "typescript-eslint": "^8.46.1"
-  },
-  "dependencies": {
-    "@google/generative-ai": "^0.21.0",
-    "fs-extra": "^11.0.4",
-    "openai": "^4.14.2",
-    "simple-git": "^3.17.0"
-  },
-  "license": "MIT"
+  }
 }

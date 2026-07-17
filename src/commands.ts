@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 import { generateCommitMsg } from './generate-commit-msg';
 import { ProviderRegistry } from './providers/registry';
 import { I18n } from './i18n';
+import { getErrorMessage } from './providers/shared';
 
 /**
  * Manages the registration and disposal of commands.
@@ -60,13 +61,16 @@ export class CommandManager {
     */
   }
 
-  private registerCommand(command: string, handler: (...args: any[]) => any) {
+  private registerCommand(command: string, handler: (...args: unknown[]) => unknown | Promise<unknown>) {
     const disposable = vscode.commands.registerCommand(command, async (...args) => {
       try {
         await handler(...args);
       } catch (error) {
+        if (error instanceof vscode.CancellationError) {
+          return;
+        }
         const result = await vscode.window.showErrorMessage(
-          `${I18n.t('status.failed')}: ${error.message}`,
+          `${I18n.t('status.failed')}: ${getErrorMessage(error, I18n.t('error.unexpectedError'))}`,
           I18n.t('button.retry'),
           I18n.t('button.configure')
         );

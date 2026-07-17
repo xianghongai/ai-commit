@@ -6,7 +6,7 @@
   "config.title": "AI Commit",
   "config.language.description": "Commit message language",
   "config.language.markdown": "Sets the language used for AI-generated commit messages. The same value replaces {{LANG}} inside prompt templates so guidance and bodies stay localized.",
-  "config.providers.description": "List of LLM providers/models",
+  "config.providers.description": "List of LLM providers/models. API keys are required only for the active provider.",
   "config.activeProviderId.description": "Which provider to use from ai-commit.providers",
   "config.promptFlavor.description": "Which prompt template to use from the bundled prompt directory",
   "config.promptFlavor.conventional": "Standard conventional commits format",

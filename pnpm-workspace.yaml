@@ -1,0 +1,8 @@
+allowBuilds:
+  '@google/genai': true
+  '@vscode/vsce-sign': true
+  esbuild: true
+  keytar: true
+  protobufjs: true
+minimumReleaseAgeExclude:
+  - '@google/*'

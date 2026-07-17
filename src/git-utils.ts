@@ -2,10 +2,16 @@ import simpleGit from 'simple-git';
 import * as vscode from 'vscode';
 import { I18n } from './i18n';
 
+interface GitDiffRepository {
+  rootUri?: {
+    fsPath: string;
+  };
+}
+
 /**
  * Retrieves the staged changes from the Git repository.
  */
-export async function getDiffStaged(repo: any): Promise<{ diff: string; error?: string }> {
+export async function getDiffStaged(repo: GitDiffRepository): Promise<{ diff: string; error?: string }> {
   try {
     const rootPath = repo?.rootUri?.fsPath || vscode.workspace.workspaceFolders?.[0].uri.fsPath;
 
@@ -17,11 +23,13 @@ export async function getDiffStaged(repo: any): Promise<{ diff: string; error?: 
     const diff = await git.diff(['--staged']);
 
     return {
-      diff: diff || 'No changes staged.',
-      error: null,
+      diff,
     };
   } catch (error) {
     console.error(I18n.t('error.gitDiffRead'), error);
-    return { diff: '', error: error.message };
+    return {
+      diff: '',
+      error: error instanceof Error ? error.message : I18n.t('error.unexpectedError'),
+    };
   }
 }

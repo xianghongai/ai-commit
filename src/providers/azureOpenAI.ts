@@ -1,30 +1,38 @@
-import OpenAI from 'openai';
-import { ChatCompletionMessageParam } from 'openai/resources';
-import { AzureOpenAIConfig, ChatMessage, LLMClient } from './types';
+import { AzureOpenAI } from 'openai';
+import type { ChatCompletionCreateParamsNonStreaming } from 'openai/resources/chat/completions';
+import { getProviderTimeoutMs, toOpenAIChatMessages } from './shared';
+import type { AzureOpenAIConfig, ChatMessage, LLMClient } from './types';
 
+/** Azure OpenAI 仍要求 model 字段，但实际路由由 deployment 决定。 */
+export function buildAzureOpenAIChatRequest(
+  conf: AzureOpenAIConfig,
+  messages: ChatMessage[]
+): ChatCompletionCreateParamsNonStreaming {
+  return {
+    model: conf.model,
+    messages: toOpenAIChatMessages(messages),
+    temperature: conf.params?.temperature ?? 0.7,
+    ...(typeof conf.params?.top_p === 'number' ? { top_p: conf.params.top_p } : {}),
+    ...(typeof conf.params?.maxTokens === 'number' ? { max_tokens: conf.params.maxTokens } : {}),
+  };
+}
+
+/** 使用 openai SDK 的原生 AzureOpenAI 客户端，避免手工拼接部署路径。 */
 export function createAzureOpenAIClient(conf: AzureOpenAIConfig): LLMClient {
-  const client = new OpenAI({
+  const client = new AzureOpenAI({
     apiKey: conf.apiKey,
-    baseURL: `${conf.endpoint}/openai/deployments/${conf.deployment}`,
-    // Azure requires api-version as query and uses 'api-key' header
-    defaultQuery: { 'api-version': conf.apiVersion },
-    defaultHeaders: { 'api-key': conf.apiKey, ...(conf.headers || {}) },
-  } as any);
+    endpoint: conf.endpoint,
+    apiVersion: conf.apiVersion,
+    deployment: conf.deployment,
+    defaultHeaders: conf.headers,
+    timeout: getProviderTimeoutMs(conf),
+  });
 
   return {
-    async chat(messages: ChatMessage[]): Promise<string> {
-      const temperature = conf.params?.temperature ?? 0.7;
-      const top_p = conf.params?.top_p;
-      const max_tokens = conf.params?.maxTokens;
-
-      const completion = await client.chat.completions.create({
-        model: conf.model, // In Azure path-based routing, model can be kept as deployment's model name
-        messages: messages as unknown as ChatCompletionMessageParam[],
-        temperature,
-        ...(typeof top_p === 'number' ? { top_p } : {}),
-        ...(typeof max_tokens === 'number' ? { max_tokens } : {}),
+    async chat(messages, options): Promise<string> {
+      const completion = await client.chat.completions.create(buildAzureOpenAIChatRequest(conf, messages), {
+        signal: options?.signal,
       });
-
       return completion.choices[0]?.message?.content ?? '';
     },
   };

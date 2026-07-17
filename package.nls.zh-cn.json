@@ -6,7 +6,7 @@
   "config.title": "AI 提交",
   "config.language.description": "提交消息语言",
   "config.language.markdown": "设置 AI 生成提交消息时使用的语言，并将同样的值替换 prompt 模板中的 {{LANG}}，确保指令与正文保持本地化。",
-  "config.providers.description": "LLM 提供商/模型列表",
+  "config.providers.description": "LLM 提供商/模型列表；只有当前启用的 Provider 必须配置 API Key。",
   "config.activeProviderId.description": "从 ai-commit.providers 中选择使用哪个提供商",
   "config.promptFlavor.description": "使用内置 prompt 目录中的哪个提示词模板",
   "config.promptFlavor.conventional": "标准的常规提交格式",

@@ -3,6 +3,8 @@ import { CommandManager } from './commands';
 import { ConfigurationManager } from './config';
 import { ProviderRegistry } from './providers/registry';
 import { I18n } from './i18n';
+import { getErrorMessage } from './providers/shared';
+import type { ProviderSettingsEntry } from './providers/types';
 
 /**
  * Activates the extension and registers commands.
@@ -26,7 +28,22 @@ export async function activate(context: vscode.ExtensionContext) {
       },
     });
 
-    const providers = ProviderRegistry.getProviders();
+    let providers: ProviderSettingsEntry[];
+    try {
+      providers = ProviderRegistry.getProviders();
+      if (providers.length) {
+        ProviderRegistry.getActiveProviderOrThrow();
+      }
+    } catch (error) {
+      const result = await vscode.window.showErrorMessage(
+        getErrorMessage(error, I18n.t('error.unexpectedError')),
+        I18n.t('button.configure')
+      );
+      if (result === I18n.t('button.configure')) {
+        await vscode.commands.executeCommand('workbench.action.openSettings', 'ai-commit.providers');
+      }
+      return;
+    }
     if (!providers.length) {
       const result = await vscode.window.showWarningMessage(
         I18n.t('error.noProviders'),
