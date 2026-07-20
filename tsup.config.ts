@@ -6,7 +6,7 @@ export default defineConfig((options) => ({
   platform: 'node',
   sourcemap: true,
   external: ['vscode'],
-  noExternal: ['@google/generative-ai', 'fs-extra', 'openai', 'simple-git'],
+  noExternal: ['@google/genai', 'fs-extra', 'openai', 'simple-git'],
   outDir: 'dist',
   clean: !options.watch,
   minify: options.minify ?? false,
