@@ -2,7 +2,7 @@
   "name": "vscode-ai-commit",
   "displayName": "AI Commit++",
   "description": "%description%",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "packageManager": "pnpm@11.13.0",
   "engines": {
     "node": ">=22.12.0",
