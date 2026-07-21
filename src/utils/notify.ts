@@ -13,10 +13,6 @@ export function formatTimestamp(d: Date = new Date()): string {
   return `${yyyy}-${MM}-${dd} ${HH}:${mm}:${ss}`;
 }
 
-export function getProviderLabel(conf: ProviderConfig): string {
-  return conf.displayName || `${conf.type} · ${conf.model}`;
-}
-
 // Show a transient toast-like notification (bottom-right) that auto-hides after timeout
 export function showToast(message: string, timeoutMs?: number) {
   const ms = Math.max(1000, timeoutMs ?? 3000);
@@ -27,6 +23,6 @@ export function showToast(message: string, timeoutMs?: number) {
 
 export function notifyStatusToast(status: 'success' | 'failed', conf: ProviderConfig) {
   const statusText = status === 'success' ? I18n.t('status.success') : I18n.t('status.failed');
-  const text = `${statusText} ${formatTimestamp()} ${getProviderLabel(conf)}`;
+  const text = `${statusText} ${formatTimestamp()} ${conf.model}`;
   showToast(text);
 }

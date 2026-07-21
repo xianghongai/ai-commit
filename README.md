@@ -45,8 +45,17 @@
 {
   "ai-commit.providers": [
     {
+      "id": "deepseek-v4-flash",
+      "type": "openai-compatible",
+      "baseUrl": "https://api.deepseek.com",
+      "apiKey": "${env:DEEP_SEEK_API_KEY}",
+      "model": "deepseek-v4-flash",
+      "params": {
+        "temperature": 0.4,
+      }
+    },
+    {
       "id": "compatible-default",
-      "displayName": "OpenAI Compatible",
       "type": "openai-compatible",
       "baseUrl": "<OPENAI_COMPATIBLE_BASE_URL>",
       "apiKey": "${env:OPENAI_COMPATIBLE_API_KEY}",
@@ -55,7 +64,6 @@
     },
     {
       "id": "openai-default",
-      "displayName": "OpenAI",
       "type": "openai",
       "apiKey": "${env:OPENAI_API_KEY}",
       "model": "<OPENAI_MODEL>",
@@ -63,7 +71,6 @@
     },
     {
       "id": "gemini-default",
-      "displayName": "Gemini",
       "type": "gemini",
       "apiKey": "${env:GEMINI_API_KEY}",
       "model": "<GEMINI_MODEL>",
@@ -71,7 +78,6 @@
     },
     {
       "id": "azure-openai-default",
-      "displayName": "Azure OpenAI",
       "type": "azure-openai",
       "endpoint": "<AZURE_OPENAI_ENDPOINT>",
       "apiKey": "${env:AZURE_OPENAI_API_KEY}",
@@ -82,7 +88,6 @@
     },
     {
       "id": "ollama-local",
-      "displayName": "Ollama",
       "type": "ollama",
       "model": "<OLLAMA_MODEL>",
       "timeoutMs": 120000,

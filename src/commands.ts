@@ -18,7 +18,7 @@ export class CommandManager {
       vscode.commands.executeCommand('workbench.action.openSettings', 'ai-commit')
     );
 
-    // Switch active provider (vendor/model)
+    // model 是唯一用户可见名称；id 仅用于稳定定位具体配置。
     this.registerCommand('ai-commit.switchProvider', async () => {
       const providers = ProviderRegistry.getProviders();
       if (!providers.length) {
@@ -27,8 +27,8 @@ export class CommandManager {
       }
       const activeId = ProviderRegistry.getActiveProviderId();
       const items = providers.map((p) => ({
-        label: p.displayName || p.id,
-        description: `${p.type} · ${p.model}`,
+        label: p.model,
+        description: `${p.type} · ${p.id}`,
         picked: p.id === activeId,
         id: p.id,
       }));

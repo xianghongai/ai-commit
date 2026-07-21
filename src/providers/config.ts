@@ -127,7 +127,6 @@ function parseBaseProviderConfig(record: ConfigRecord, index: number): Omit<Base
     id: requireString(record, 'id', index),
     model: requireString(record, 'model', index),
     ...(modelKind ? { modelKind: 'chat' as const } : {}),
-    ...optionalStringProperty(record, 'displayName', index),
     ...optionalPositiveNumberProperty(record, 'timeoutMs', index),
     ...parseHeadersProperty(record, index),
     ...parseParamsProperty(record, index),

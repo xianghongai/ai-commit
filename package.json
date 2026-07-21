@@ -135,9 +135,6 @@
               "id": {
                 "type": "string"
               },
-              "displayName": {
-                "type": "string"
-              },
               "type": {
                 "type": "string",
                 "enum": [

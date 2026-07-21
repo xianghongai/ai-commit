@@ -33,7 +33,6 @@ export interface BaseProviderConfig {
   type: ProviderType;
   model: string;
   modelKind?: ModelKind;
-  displayName?: string;
   timeoutMs?: number;
   headers?: Record<string, string>;
   params?: ChatGenerationParams;
