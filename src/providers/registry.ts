@@ -3,7 +3,7 @@ import { I18n } from '../i18n';
 import { getErrorMessage } from './shared';
 import {
   parseProviderConfigs,
-  resolveEnvironmentVariables,
+  ProviderApiKeyEnvironmentVariableError,
   selectActiveProvider,
   validateProviderConfig,
 } from './config';
@@ -15,12 +15,9 @@ export class ProviderRegistry {
     const config = vscode.workspace.getConfiguration('ai-commit');
     const raw = config.get<unknown>('providers', []);
     try {
-      return parseProviderConfigs(resolveEnvironmentVariables(raw));
+      return parseProviderConfigs(raw);
     } catch (error) {
-      throw new Error(
-        I18n.t('error.invalidProviderConfig', getErrorMessage(error, I18n.t('error.unexpectedError'))),
-        { cause: error }
-      );
+      throw createInvalidProviderConfigError(error);
     }
   }
 
@@ -30,13 +27,22 @@ export class ProviderRegistry {
   }
 
   static async setActiveProviderId(id: string): Promise<void> {
-    selectActiveProvider(this.getProviders(), id);
+    const providers = this.getProviders();
+    try {
+      selectActiveProvider(providers, id);
+    } catch (error) {
+      throw createInvalidProviderConfigError(error);
+    }
     const config = vscode.workspace.getConfiguration('ai-commit');
     await config.update('activeProviderId', id, vscode.ConfigurationTarget.Global);
   }
 
   static validate(conf: ProviderSettingsEntry): ProviderConfig {
-    return validateProviderConfig(conf);
+    try {
+      return validateProviderConfig(conf);
+    } catch (error) {
+      throw createInvalidProviderConfigError(error);
+    }
   }
 
   /** 显式配置失效时拒绝 fallback，避免代码 diff 被发送给非预期 Provider。 */
@@ -52,10 +58,23 @@ export class ProviderRegistry {
     try {
       return selectActiveProvider(providers, activeProviderId);
     } catch (error) {
-      throw new Error(
-        I18n.t('error.invalidProviderConfig', getErrorMessage(error, I18n.t('error.unexpectedError'))),
-        { cause: error }
-      );
+      throw createInvalidProviderConfigError(error);
     }
   }
+}
+
+function createInvalidProviderConfigError(error: unknown): Error {
+  const message = getProviderConfigErrorMessage(error);
+  return new Error(I18n.t('error.invalidProviderConfig', message), { cause: error });
+}
+
+function getProviderConfigErrorMessage(error: unknown): string {
+  if (error instanceof ProviderApiKeyEnvironmentVariableError) {
+    return I18n.t(
+      'error.providerApiKeyEnvironmentVariableMissing',
+      error.providerId,
+      error.variableName
+    );
+  }
+  return getErrorMessage(error, I18n.t('error.unexpectedError'));
 }

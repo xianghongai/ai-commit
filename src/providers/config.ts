@@ -15,20 +15,19 @@ type OpenAIChatSettingsEntry = Extract<
 type AzureOpenAISettingsEntry = Extract<ProviderSettingsEntry, { type: 'azure-openai' }>;
 type GeminiSettingsEntry = Extract<ProviderSettingsEntry, { type: 'gemini' }>;
 
-/** 仅解析契约声明的 ${env:VAR} 语法，并递归处理配置对象。 */
-export function resolveEnvironmentVariables(value: unknown): unknown {
-  if (typeof value === 'string') {
-    return value.replace(/\$\{env:([A-Z0-9_]+)\}/gi, (_match, name: string) => process.env[name] ?? '');
-  }
-  if (Array.isArray(value)) {
-    return value.map((item) => resolveEnvironmentVariables(item));
-  }
-  if (isConfigRecord(value)) {
-    return Object.fromEntries(
-      Object.entries(value).map(([key, item]) => [key, resolveEnvironmentVariables(item)])
+const ENVIRONMENT_API_KEY_PATTERN = /^\$\{env:([A-Za-z_][A-Za-z0-9_]*)\}$/;
+
+/** 保留环境变量名以便 Registry 生成本地化错误，不暴露密钥值。 */
+export class ProviderApiKeyEnvironmentVariableError extends Error {
+  constructor(
+    readonly providerId: string,
+    readonly variableName: string
+  ) {
+    super(
+      `[ai-commit] provider '${providerId}' references environment variable '${variableName}' for apiKey, but it is not set`
     );
+    this.name = 'ProviderApiKeyEnvironmentVariableError';
   }
-  return value;
 }
 
 /**
@@ -288,7 +287,16 @@ function requireActiveApiKey(value: string | undefined, id: string, index: numbe
       `[ai-commit] provider '${id}' (providers[${index}]).apiKey is required for the active provider`
     );
   }
-  return value;
+  const environmentReference = ENVIRONMENT_API_KEY_PATTERN.exec(value);
+  if (!environmentReference) {
+    return value;
+  }
+  const variableName = environmentReference[1];
+  const resolvedValue = process.env[variableName];
+  if (!resolvedValue) {
+    throw new ProviderApiKeyEnvironmentVariableError(id, variableName);
+  }
+  return resolvedValue;
 }
 
 function optionalString(record: ConfigRecord, key: string, index: number): string | undefined {

@@ -18,13 +18,11 @@
   </a>
 </p>
 
-![截图](https://raw.githubusercontent.com/xianghongai/vscode-ai-commit/main/images/screenshots.png)
+![Screenshot](https://raw.githubusercontent.com/xianghongai/vscode-ai-commit/main/images/screenshots.png)
 
-[English](README-EN.md)
+Adhere to the [Conventional Commits specification](https://www.conventionalcommits.org/en/v1.0.0/)."
 
-遵循 [约定式提交规范](https://www.conventionalcommits.org/zh-hans/v1.0.0/)。
-
-## 支持的 Provider
+## Supported Providers
 
 - [x] `openai-compatible`
 - [x] `openai`
@@ -33,9 +31,9 @@
 - [x] `azure-openai`
 - [x] `ollama`
 
-`openai-compatible` 已完成真实服务验证；其它 Provider 已按官方 SDK/API 契约实现，并通过本地请求映射和响应解析测试，尚未使用真实账号联调。
+`openai-compatible` has been verified against a live service. The remaining providers are implemented against their official SDK/API contracts and covered by local request-mapping and response-parsing tests, but have not yet been verified with live accounts.
 
-## 配置示例
+## Configuration example
 
 ```json
 {
@@ -100,19 +98,19 @@
       "params": { "temperature": 0.3 }
     }
   ],
-  "ai-commit.activeProviderId": "deepseek-v4-flash",
-  "ai-commit.commitLanguage": "Simplified Chinese"
+  "ai-commit.activeProviderId": "compatible-default",
+  "ai-commit.commitLanguage": "English"
 }
 ```
 
-建议将 temperature 设置为较低值（0.2 至 0.5），以获得更稳定、更简洁的提交消息。
+Set temperature to a relatively low value (0.2 to 0.5) for more stable and concise commit messages.
 
-`apiKey` 可直接填写明文 Key/Token，也可使用 `${env:VARIABLE_NAME}` [^1] 语法引用环境变量。环境变量必须存在于 VS Code Extension Host 的运行环境中；修改后请完全退出并重新启动 VS Code。
+`apiKey` accepts a plaintext key/token or an environment-variable reference using `${env:VARIABLE_NAME}` [^1]. The environment variable must be available to the VS Code Extension Host. Completely quit and restart VS Code after changing it.
 
-## 致谢
+## Special Thanks
 
-- Fork from [sitoi/ai-commit](https://github.com/sitoi/ai-commit)
+- Forked from [sitoi/ai-commit](https://github.com/sitoi/ai-commit)
 
 ---
 
-[^1]: VS Code 不会为普通设置项自动对 `${env:VARIABLE_NAME}` 做插值。`launch.json` 和 `tasks.json` 等调试或任务配置支持该语法；本扩展在内部解析它。
+[^1]: VS Code does not automatically interpolate `${env:VARIABLE_NAME}` in arbitrary settings. Debug and task configurations such as `launch.json` and `tasks.json` support the syntax; this extension resolves it internally.

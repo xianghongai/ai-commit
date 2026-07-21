@@ -22,6 +22,8 @@ export class I18n {
       'error.bundledPromptRead': 'Unable to read bundled prompt file "{0}"',
       'error.noProvidersConfigured': 'No providers configured. Please configure ai-commit.providers',
       'error.invalidProviderConfig': 'Invalid provider configuration: {0}',
+      'error.providerApiKeyEnvironmentVariableMissing':
+        'Provider "{0}" references environment variable "{1}" for apiKey, but it is not set.',
       'error.activeProviderNotFound': 'Configured provider "{0}" was not found. Select an available provider.',
       'progress.gettingStagedChanges': 'Getting staged changes...',
       'progress.analyzingChanges': 'Analyzing changes...',
@@ -53,6 +55,8 @@ export class I18n {
       'error.bundledPromptRead': '无法读取内置提示词文件“{0}”',
       'error.noProvidersConfigured': '未配置提供商。请配置 ai-commit.providers',
       'error.invalidProviderConfig': 'Provider 配置无效：{0}',
+      'error.providerApiKeyEnvironmentVariableMissing':
+        'Provider“{0}”的 apiKey 引用了未设置的环境变量“{1}”。',
       'error.activeProviderNotFound': '找不到已配置的 Provider“{0}”，请选择可用的 Provider。',
       'progress.gettingStagedChanges': '正在获取暂存的更改...',
       'progress.analyzingChanges': '正在分析更改...',

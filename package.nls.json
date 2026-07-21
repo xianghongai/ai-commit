@@ -7,6 +7,7 @@
   "config.language.description": "Commit message language",
   "config.language.markdown": "Sets the language used for AI-generated commit messages. The same value replaces {{LANG}} inside prompt templates so guidance and bodies stay localized.",
   "config.providers.description": "List of LLM providers/models. API keys are required only for the active provider.",
+  "config.providers.apiKey.markdown": "API key or token. Enter a plaintext value, or reference an environment variable using the exact `${env:VARIABLE_NAME}` syntax. Environment variables are resolved only for the active provider from the VS Code Extension Host environment.",
   "config.activeProviderId.description": "Which provider to use from ai-commit.providers",
   "config.promptFlavor.description": "Which prompt template to use from the bundled prompt directory",
   "config.promptFlavor.conventional": "Standard conventional commits format",

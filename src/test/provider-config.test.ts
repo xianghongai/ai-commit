@@ -2,7 +2,6 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import {
   parseProviderConfigs,
-  resolveEnvironmentVariables,
   selectActiveProvider,
 } from '../providers/config';
 
@@ -14,11 +13,28 @@ test('parses OpenAI without requiring a custom base URL', () => {
   assert.equal('baseUrl' in providers[0] ? providers[0].baseUrl : undefined, undefined);
 });
 
-test('resolves the documented environment placeholder before validation', () => {
+test('passes a plaintext API key through unchanged', () => {
+  const providers = parseProviderConfigs([
+    { id: 'openai', type: 'openai', model: 'model', apiKey: 'plaintext-key' },
+  ]);
+
+  const activeProvider = selectActiveProvider(providers, 'openai');
+  assert.equal('apiKey' in activeProvider ? activeProvider.apiKey : undefined, 'plaintext-key');
+});
+
+test('resolves the documented API key environment placeholder for the active provider', () => {
   process.env.AI_COMMIT_TEST_KEY = 'resolved-key';
   try {
-    const resolved = resolveEnvironmentVariables({ apiKey: '${env:AI_COMMIT_TEST_KEY}' });
-    assert.deepEqual(resolved, { apiKey: 'resolved-key' });
+    const providers = parseProviderConfigs([
+      {
+        id: 'openai',
+        type: 'openai',
+        model: 'model',
+        apiKey: '${env:AI_COMMIT_TEST_KEY}',
+      },
+    ]);
+    const activeProvider = selectActiveProvider(providers, 'openai');
+    assert.equal('apiKey' in activeProvider ? activeProvider.apiKey : undefined, 'resolved-key');
   } finally {
     delete process.env.AI_COMMIT_TEST_KEY;
   }
@@ -71,19 +87,25 @@ test('requires an API key when the first provider is implicitly active', () => {
 
 test('treats an unresolved API key as an allowed inactive template credential', () => {
   delete process.env.AI_COMMIT_MISSING_TEST_KEY;
-  const providers = parseProviderConfigs(
-    resolveEnvironmentVariables([
-      {
-        id: 'template',
-        type: 'gemini',
-        model: 'template-model',
-        apiKey: '${env:AI_COMMIT_MISSING_TEST_KEY}',
-      },
-      { id: 'local', type: 'ollama', model: 'local-model' },
-    ])
-  );
+  const providers = parseProviderConfigs([
+    {
+      id: 'template',
+      type: 'gemini',
+      model: 'template-model',
+      apiKey: '${env:AI_COMMIT_MISSING_TEST_KEY}',
+    },
+    { id: 'local', type: 'ollama', model: 'local-model' },
+  ]);
 
+  assert.equal(
+    'apiKey' in providers[0] ? providers[0].apiKey : undefined,
+    '${env:AI_COMMIT_MISSING_TEST_KEY}'
+  );
   assert.equal(selectActiveProvider(providers, 'local').id, 'local');
+  assert.throws(
+    () => selectActiveProvider(providers, 'template'),
+    /references environment variable 'AI_COMMIT_MISSING_TEST_KEY' for apiKey, but it is not set/
+  );
 });
 
 test('validates provider-specific required fields', () => {
