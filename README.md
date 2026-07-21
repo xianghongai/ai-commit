@@ -18,7 +18,7 @@
   </a>
 </p>
 
-![截图](https://raw.githubusercontent.com/xianghongai/vscode-ai-commit/main/images/screenshots.png)
+![截图](https://raw.githubusercontent.com/xianghongai/vscode-ai-commit/main/images/screenshots.gif)
 
 [English](README-EN.md)
 
@@ -32,8 +32,6 @@
 - [x] `gemini`
 - [x] `azure-openai`
 - [x] `ollama`
-
-`openai-compatible` 已完成真实服务验证；其它 Provider 已按官方 SDK/API 契约实现，并通过本地请求映射和响应解析测试，尚未使用真实账号联调。
 
 ## 配置示例
 
@@ -109,9 +107,13 @@
 
 `apiKey` 可直接填写明文 Key/Token，也可使用 `${env:VARIABLE_NAME}` [^1] 语法引用环境变量。环境变量必须存在于 VS Code Extension Host 的运行环境中；修改后请完全退出并重新启动 VS Code。
 
-## 致谢
+## Credits
 
-- Fork from [sitoi/ai-commit](https://github.com/sitoi/ai-commit)
+- <https://github.com/sitoi/ai-commit>
+
+## License
+
+MIT。
 
 ---
 

@@ -18,7 +18,7 @@
   </a>
 </p>
 
-![Screenshot](https://raw.githubusercontent.com/xianghongai/vscode-ai-commit/main/images/screenshots.png)
+![Screenshot](https://raw.githubusercontent.com/xianghongai/vscode-ai-commit/main/images/screenshots.gif)
 
 Adhere to the [Conventional Commits specification](https://www.conventionalcommits.org/en/v1.0.0/)."
 
@@ -30,8 +30,6 @@ Adhere to the [Conventional Commits specification](https://www.conventionalcommi
 - [x] `gemini`
 - [x] `azure-openai`
 - [x] `ollama`
-
-`openai-compatible` has been verified against a live service. The remaining providers are implemented against their official SDK/API contracts and covered by local request-mapping and response-parsing tests, but have not yet been verified with live accounts.
 
 ## Configuration example
 
@@ -107,9 +105,13 @@ Set temperature to a relatively low value (0.2 to 0.5) for more stable and conci
 
 `apiKey` accepts a plaintext key/token or an environment-variable reference using `${env:VARIABLE_NAME}` [^1]. The environment variable must be available to the VS Code Extension Host. Completely quit and restart VS Code after changing it.
 
-## Special Thanks
+## Credits
 
-- Forked from [sitoi/ai-commit](https://github.com/sitoi/ai-commit)
+- <https://github.com/sitoi/ai-commit>
+
+## License
+
+MIT。
 
 ---
 
