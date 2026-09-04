@@ -46,8 +46,8 @@
     "simple-git": "^3.17.0"
   },
   "devDependencies": {
-    "@types/node": "^24.13.3",
-    "@types/vscode": "1.100.0",
+    "@types/node": "^26.4.0",
+    "@types/vscode": "1.134.0",
     "@vscode/vsce": "^3.9.2",
     "esbuild": "^0.28.2",
     "lint-staged": "^17.4.1",
