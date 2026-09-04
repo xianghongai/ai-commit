@@ -41,9 +41,9 @@
     "postinstall": "simple-git-hooks"
   },
   "dependencies": {
-    "@google/genai": "^2.12.0",
-    "openai": "^4.14.2",
-    "simple-git": "^3.17.0"
+    "@google/genai": "^2.20.0",
+    "openai": "^7.8.0",
+    "simple-git": "^3.36.0"
   },
   "devDependencies": {
     "@types/node": "^24.13.3",
