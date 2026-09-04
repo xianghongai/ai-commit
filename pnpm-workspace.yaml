@@ -4,5 +4,7 @@ allowBuilds:
   esbuild: true
   keytar: true
   protobufjs: true
+  # 钩子安装由本仓库的 postinstall 显式触发，不借依赖自身的安装脚本
+  simple-git-hooks: false
 minimumReleaseAgeExclude:
   - '@google/*'

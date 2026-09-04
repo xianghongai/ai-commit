@@ -1,11 +1,11 @@
 import assert from 'node:assert/strict';
-import test from 'node:test';
-import { buildAzureOpenAIChatRequest } from '../providers/azureOpenAI';
-import { createClient } from '../providers/factory';
-import { buildGeminiRequest } from '../providers/gemini';
-import { buildOllamaChatRequest, parseOllamaChatResponse } from '../providers/ollama';
-import { buildOpenAIChatRequest } from '../providers/openaiCompatible';
-import type { ChatMessage, ProviderConfig } from '../providers/types';
+import { test } from 'vitest';
+import { buildAzureOpenAIChatRequest } from '@/providers/azureOpenAI';
+import { createClient } from '@/providers/factory';
+import { buildGeminiRequest } from '@/providers/gemini';
+import { buildOllamaChatRequest, parseOllamaChatResponse } from '@/providers/ollama';
+import { buildOpenAIChatRequest } from '@/providers/openaiCompatible';
+import type { ChatMessage, ProviderConfig } from '@/providers/types';
 
 const messages: ChatMessage[] = [
   { role: 'system', content: 'system instruction' },

@@ -8,10 +8,7 @@ import type {
 } from './types';
 
 type ConfigRecord = Record<string, unknown>;
-type OpenAIChatSettingsEntry = Extract<
-  ProviderSettingsEntry,
-  { type: 'openai' | 'openai-compatible' | 'openrouter' }
->;
+type OpenAIChatSettingsEntry = Extract<ProviderSettingsEntry, { type: 'openai' | 'openai-compatible' | 'openrouter' }>;
 type AzureOpenAISettingsEntry = Extract<ProviderSettingsEntry, { type: 'azure-openai' }>;
 type GeminiSettingsEntry = Extract<ProviderSettingsEntry, { type: 'gemini' }>;
 
@@ -54,17 +51,12 @@ export function parseProviderConfigs(value: unknown): ProviderSettingsEntry[] {
 /**
  * 精确选择活动 Provider，并在 staged diff 进入 adapter 前强制校验其凭据。
  */
-export function selectActiveProvider(
-  providers: ProviderSettingsEntry[],
-  activeProviderId?: string
-): ProviderConfig {
+export function selectActiveProvider(providers: ProviderSettingsEntry[], activeProviderId?: string): ProviderConfig {
   if (!providers.length) {
     throw new Error('[ai-commit] no providers configured');
   }
 
-  const providerIndex = activeProviderId
-    ? providers.findIndex(({ id }) => id === activeProviderId)
-    : 0;
+  const providerIndex = activeProviderId ? providers.findIndex(({ id }) => id === activeProviderId) : 0;
   const provider = providers[providerIndex];
   if (!provider) {
     throw new Error(`[ai-commit] active provider '${activeProviderId}' was not found`);
@@ -73,10 +65,7 @@ export function selectActiveProvider(
 }
 
 /** 将选中的 settings 条目收敛为 adapter 可消费的完整 ProviderConfig。 */
-export function validateProviderConfig(
-  conf: ProviderSettingsEntry,
-  index = 0
-): ProviderConfig {
+export function validateProviderConfig(conf: ProviderSettingsEntry, index = 0): ProviderConfig {
   switch (conf.type) {
     case 'openai':
     case 'openai-compatible':
@@ -139,9 +128,7 @@ function parseOpenAIConfig(
   requireBaseUrl: boolean,
   index: number
 ): OpenAIChatSettingsEntry {
-  const baseUrl = requireBaseUrl
-    ? requireString(record, 'baseUrl', index)
-    : optionalString(record, 'baseUrl', index);
+  const baseUrl = requireBaseUrl ? requireString(record, 'baseUrl', index) : optionalString(record, 'baseUrl', index);
   const apiKey = optionalString(record, 'apiKey', index);
   const organization = optionalString(record, 'organization', index);
   if (type === 'openai') {
@@ -189,11 +176,7 @@ function parseGeminiConfig(
   };
 }
 
-function parseOllamaConfig(
-  record: ConfigRecord,
-  base: Omit<BaseProviderConfig, 'type'>,
-  index: number
-): OllamaConfig {
+function parseOllamaConfig(record: ConfigRecord, base: Omit<BaseProviderConfig, 'type'>, index: number): OllamaConfig {
   return {
     ...base,
     type: 'ollama',
@@ -240,20 +223,12 @@ function parseParamsProperty(record: ConfigRecord, index: number): Pick<BaseProv
   return { params };
 }
 
-function optionalStringProperty(
-  record: ConfigRecord,
-  key: string,
-  index: number
-): Record<string, string> {
+function optionalStringProperty(record: ConfigRecord, key: string, index: number): Record<string, string> {
   const value = optionalString(record, key, index);
   return value === undefined ? {} : { [key]: value };
 }
 
-function optionalPositiveNumberProperty(
-  record: ConfigRecord,
-  key: string,
-  index: number
-): Record<string, number> {
+function optionalPositiveNumberProperty(record: ConfigRecord, key: string, index: number): Record<string, number> {
   const property = optionalNumberProperty(record, key, `providers[${index}]`);
   const value = property[key];
   if (value !== undefined && value <= 0) {
@@ -283,9 +258,7 @@ function requireString(record: ConfigRecord, key: string, index: number): string
 
 function requireActiveApiKey(value: string | undefined, id: string, index: number): string {
   if (!value) {
-    throw new Error(
-      `[ai-commit] provider '${id}' (providers[${index}]).apiKey is required for the active provider`
-    );
+    throw new Error(`[ai-commit] provider '${id}' (providers[${index}]).apiKey is required for the active provider`);
   }
   const environmentReference = ENVIRONMENT_API_KEY_PATTERN.exec(value);
   if (!environmentReference) {

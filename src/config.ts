@@ -15,7 +15,8 @@ export enum ConfigKeys {
  */
 export class ConfigurationManager {
   private static instance: ConfigurationManager;
-  private configCache: Map<string, any> = new Map();
+  // 缓存跨多种配置项类型，取值时由 getConfig 的类型参数还原
+  private configCache: Map<string, unknown> = new Map();
   private disposable: vscode.Disposable;
   private context: vscode.ExtensionContext;
 
@@ -40,14 +41,13 @@ export class ConfigurationManager {
   getConfig<T>(key: string, defaultValue?: T): T {
     if (!this.configCache.has(key)) {
       const config = vscode.workspace.getConfiguration('ai-commit');
-      const value = config.get<T>(key, defaultValue);
-      this.configCache.set(key, value as T);
+      this.configCache.set(key, config.get<T>(key) ?? defaultValue);
     }
-    return this.configCache.get(key);
+    // 缓存值类型已在写入处丢失，只能由调用方的类型参数还原
+    return this.configCache.get(key) as T;
   }
 
   dispose() {
     this.disposable.dispose();
   }
-
 }

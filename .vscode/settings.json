@@ -1,11 +1,18 @@
 {
-  "files.exclude": {
-    "out": false,
-    "dist": false
+  "[json]": {
+    "editor.defaultFormatter": "oxc.oxc-vscode"
   },
-  "search.exclude": {
-    "out": true,
-    "dist": true
+  "[jsonc]": {
+    "editor.defaultFormatter": "oxc.oxc-vscode"
   },
-  "typescript.tsc.autoDetect": "off"
+  "[javascript]": {
+    "editor.defaultFormatter": "oxc.oxc-vscode"
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "oxc.oxc-vscode"
+  },
+  "[markdown]": {
+    "editor.defaultFormatter": "oxc.oxc-vscode"
+  },
+  "npm.packageManager": "pnpm"
 }

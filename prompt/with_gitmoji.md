@@ -27,6 +27,18 @@ You will act as a git commit message generator. When receiving a git diff, you w
 ...
 ```
 
+### Breaking Changes and Footers
+
+For breaking changes, mark the header with `!` and add a `BREAKING CHANGE:` footer. Keep the type emoji as usual; the `!` carries the breaking-change signal.
+
+```
+<emoji> <type>(<scope>)!: <subject>
+
+<body>
+
+BREAKING CHANGE: <description>
+```
+
 ## Type Reference
 
 | Type     | Emoji | Description          | Example Scopes      |
@@ -36,9 +48,9 @@ You will act as a git commit message generator. When receiving a git diff, you w
 | docs     | 📝    | Documentation        | README, API         |
 | style    | 💄    | Code style           | formatting          |
 | refactor | ♻️    | Code refactoring     | utils, helpers      |
-| perf     | ⚡️   | Performance          | query, cache        |
+| perf     | ⚡️    | Performance          | query, cache        |
 | test     | ✅    | Testing              | unit, e2e           |
-| build    | 📦    | Build system         | tsup, npm           |
+| build    | 📦    | Build system         | esbuild, npm        |
 | ci       | 👷    | CI config            | Travis, Jenkins     |
 | chore    | 🔧    | Other changes        | scripts, config     |
 | i18n     | 🌐    | Internationalization | locale, translation |

@@ -1,11 +1,5 @@
 /** Provider 类型必须与 VS Code manifest 中的配置枚举保持一致。 */
-export type ProviderType =
-  | 'openai'
-  | 'openai-compatible'
-  | 'openrouter'
-  | 'gemini'
-  | 'azure-openai'
-  | 'ollama';
+export type ProviderType = 'openai' | 'openai-compatible' | 'openrouter' | 'gemini' | 'azure-openai' | 'ollama';
 
 export type ModelKind = 'chat';
 
@@ -77,12 +71,7 @@ export interface OllamaConfig extends BaseProviderConfig {
   baseUrl?: string;
 }
 
-export type ProviderConfig =
-  | OpenAIConfig
-  | OpenAICompatibleConfig
-  | AzureOpenAIConfig
-  | GeminiConfig
-  | OllamaConfig;
+export type ProviderConfig = OpenAIConfig | OpenAICompatibleConfig | AzureOpenAIConfig | GeminiConfig | OllamaConfig;
 
 type OptionalApiKey<TConfig extends ProviderConfig> = TConfig extends { apiKey: string }
   ? Omit<TConfig, 'apiKey'> & { apiKey?: string }

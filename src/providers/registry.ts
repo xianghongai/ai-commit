@@ -70,11 +70,7 @@ function createInvalidProviderConfigError(error: unknown): Error {
 
 function getProviderConfigErrorMessage(error: unknown): string {
   if (error instanceof ProviderApiKeyEnvironmentVariableError) {
-    return I18n.t(
-      'error.providerApiKeyEnvironmentVariableMissing',
-      error.providerId,
-      error.variableName
-    );
+    return I18n.t('error.providerApiKeyEnvironmentVariableMissing', error.providerId, error.variableName);
   }
   return getErrorMessage(error, I18n.t('error.unexpectedError'));
 }

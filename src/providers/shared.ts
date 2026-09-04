@@ -16,7 +16,10 @@ export function toOpenAIChatMessages(messages: ChatMessage[]) {
  * 合并上游取消信号与 Provider 超时。
  * 调用方必须在请求结束后执行 dispose，避免长期保留取消监听器。
  */
-export function createRequestAbortScope(timeoutMs: number, upstreamSignal?: AbortSignal): {
+export function createRequestAbortScope(
+  timeoutMs: number,
+  upstreamSignal?: AbortSignal
+): {
   signal: AbortSignal;
   dispose: () => void;
 } {

@@ -1,4 +1,4 @@
-import * as fs from 'fs-extra';
+import * as fs from 'node:fs';
 import * as vscode from 'vscode';
 import { getDiffStaged } from './git-utils';
 import { I18n } from './i18n';

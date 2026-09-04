@@ -9,14 +9,16 @@
 - Git 暂存区读取在 `src/git-utils.ts`；默认只分析 staged diff，不应擅自改为读取未暂存或全部工作区变更。
 - Prompt 逻辑在 `src/prompts.ts` 和 `prompt/*.md`；Provider 类型、校验、工厂和适配器集中在 `src/providers/`。
 - VS Code manifest、配置项、命令和菜单定义在 `package.json`；扩展 manifest 本地化文案在 `package.nls.json` 和 `package.nls.zh-cn.json`。
-- 项目使用 TypeScript、CommonJS、tsup 打包，构建入口为 `src/extension.ts`，输出目录为 `dist`。
+- 项目使用 TypeScript、CommonJS，由 `esbuild.js` 打包到 `dist`；格式化用 oxfmt，检查用 oxlint，测试用 Vitest。
+- 测试放在仓库根的 `test/`，通过 `@/` 别名引用 `src/`。
+- 发布 tag 必须带 `v` 前缀，否则不触发 `.github/workflows/ci.yml`。
 
 ## 工作边界
 
 - 优先做小范围、可验证的修改；不要在未被要求时重构扩展架构、替换构建工具或批量改写文件风格。
 - 不要提交真实 API Key、账号、Token、私有证书、内网地址、真实服务域名或个人/客户信息。配置示例只使用占位符。
 - 不要把本地临时环境、端口、代理、个人路径或未确认的运行状态写入源码、文档或本文件。
-- `dist/`、`out/`、`node_modules/` 是构建或依赖产物；除非用户明确要求发布产物，否则不要把它们作为主要改动目标。
+- `dist/`、`*.vsix`、`node_modules/` 是构建或依赖产物；除非用户明确要求发布产物，否则不要把它们作为主要改动目标。
 - 修改依赖时使用现有包管理约束，仓库已有 `pnpm-lock.yaml`，优先使用 `pnpm`。
 
 ## Provider 与配置契约
@@ -46,20 +48,22 @@
 ## 代码风格
 
 - 保持现有 TypeScript 风格和模块边界：命令层处理 VS Code 交互，Provider 层处理模型调用，Prompt 层处理提示词读取与语言补充。
-- 可以保留现有 `any` 使用；不要为了满足偏好做大范围类型洁癖式改造。
+- `.oxlintrc.json` 将 `typescript/no-explicit-any` 设为 error，新代码不要引入 `any`；但不要为此对既有代码做大范围类型改造。
 - 只在复杂业务规则、兼容分支、错误处理或维护边界不明显时添加注释；避免重复代码表面含义的注释。
 - 公共接口或跨文件契约变更时，优先让类型和校验表达约束，再用少量注释说明非显然设计原因。
 
 ## 验证
 
 - 常规源码修改后优先运行：
-  - `pnpm run compile`
+  - `pnpm run check-types`
   - `pnpm run lint`
+  - `pnpm run format:check`
 - 涉及打包、发布入口、依赖或 `package.json` manifest 时运行：
-  - `pnpm run build`
+  - `pnpm run package`
 - 涉及 VS Code 集成行为、命令注册或 Git API 交互时，视变更范围运行：
-  - `pnpm run compile-tests`
-  - `pnpm test`
+  - `pnpm run test`
+- 改动 `.vscodeignore` 或运行时读取的资源路径时，必须跑 `pnpm run vsce:package` 并用 `unzip -l *.vsix` 核对 `prompt/` 与 `images/` 是否随包发布。
+- 调整 `lint-staged` 匹配模式时，不要让被 oxfmt/oxlint 忽略的文件（如 `pnpm-lock.yaml`）成为某条模式的唯一匹配项——两者在目标全被忽略时以非零码退出，会挡下提交。
 - 如果某个验证命令因环境限制无法运行，需要在最终回复中说明具体命令和失败原因。
 
 ## 文档更新

@@ -1,25 +1,29 @@
-.vscode/**
-.vscode-test/**
-.claude/**
-.codex/**
-.github/**
-.specify/**
-specs/**
-out/**
-node_modules/**
-src/**
-AGENTS.md
-.mise.toml
-.npmignore
-.prettierignore
-.prettierrc.yaml
-eslint.config.js
-pnpm-lock.yaml
-pnpm-workspace.yaml
-.gitignore
-.yarnrc
-vsc-extension-quickstart.md
-**/tsconfig.json
-**/.eslintrc.json
-**/*.map
-**/*.ts
+# 全部排除，再按需放行
+# Exclude everything, then allow-list what ships.
+#
+# 前提：打包必须带 --no-dependencies（运行时依赖已由 esbuild 打进 dist/extension.js）。
+# 若改回让 vsce 自行收集 node_modules，`**` 会把依赖一并滤掉，产出的包无法运行。
+# Requires --no-dependencies; deps are bundled by esbuild into dist/extension.js.
+**
+
+# ── 扩展本体 / Extension ──────────
+!package.json
+!package.nls.json
+!package.nls.*.json
+!dist/extension.js
+
+# 运行时由 src/prompts.ts 从 __dirname/../prompt 读取，必须随包发布。
+# Read at runtime by src/prompts.ts; must ship.
+!prompt/**
+
+# 命令的 dark/light 图标，由 package.json 的 contributes.commands 引用。
+# Command icons referenced from contributes.commands.
+!images/icon.svg
+!images/icon-gray.svg
+
+# ── Marketplace 展示 / Listing ────
+!README.md
+!README-EN.md
+!CHANGELOG.md
+!LICENSE
+!images/logo.png

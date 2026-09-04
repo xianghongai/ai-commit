@@ -1,22 +1,15 @@
 import assert from 'node:assert/strict';
-import test from 'node:test';
-import {
-  parseProviderConfigs,
-  selectActiveProvider,
-} from '../providers/config';
+import { test } from 'vitest';
+import { parseProviderConfigs, selectActiveProvider } from '@/providers/config';
 
 test('parses OpenAI without requiring a custom base URL', () => {
-  const providers = parseProviderConfigs([
-    { id: 'openai', type: 'openai', model: 'model', apiKey: 'key' },
-  ]);
+  const providers = parseProviderConfigs([{ id: 'openai', type: 'openai', model: 'model', apiKey: 'key' }]);
   assert.equal(providers[0].type, 'openai');
   assert.equal('baseUrl' in providers[0] ? providers[0].baseUrl : undefined, undefined);
 });
 
 test('passes a plaintext API key through unchanged', () => {
-  const providers = parseProviderConfigs([
-    { id: 'openai', type: 'openai', model: 'model', apiKey: 'plaintext-key' },
-  ]);
+  const providers = parseProviderConfigs([{ id: 'openai', type: 'openai', model: 'model', apiKey: 'plaintext-key' }]);
 
   const activeProvider = selectActiveProvider(providers, 'openai');
   assert.equal('apiKey' in activeProvider ? activeProvider.apiKey : undefined, 'plaintext-key');
@@ -75,9 +68,7 @@ test('allows inactive provider templates without API keys', () => {
 });
 
 test('requires an API key when the first provider is implicitly active', () => {
-  const providers = parseProviderConfigs([
-    { id: 'template', type: 'openai', model: 'template-model' },
-  ]);
+  const providers = parseProviderConfigs([{ id: 'template', type: 'openai', model: 'template-model' }]);
 
   assert.throws(
     () => selectActiveProvider(providers),
@@ -97,10 +88,7 @@ test('treats an unresolved API key as an allowed inactive template credential', 
     { id: 'local', type: 'ollama', model: 'local-model' },
   ]);
 
-  assert.equal(
-    'apiKey' in providers[0] ? providers[0].apiKey : undefined,
-    '${env:AI_COMMIT_MISSING_TEST_KEY}'
-  );
+  assert.equal('apiKey' in providers[0] ? providers[0].apiKey : undefined, '${env:AI_COMMIT_MISSING_TEST_KEY}');
   assert.equal(selectActiveProvider(providers, 'local').id, 'local');
   assert.throws(
     () => selectActiveProvider(providers, 'template'),

@@ -1,5 +1,4 @@
 {
-  "displayName": "AI 提交",
   "description": "使用 AI 生成符合约定的规范提交消息",
   "command.aiCommit": "AI 提交",
   "command.switchProvider": "AI 提交：切换提供商/模型",

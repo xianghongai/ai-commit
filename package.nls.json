@@ -1,5 +1,4 @@
 {
-  "displayName": "AI Commit",
   "description": "Use AI to generate conventional commit messages that meet the conventions",
   "command.aiCommit": "AI Commit",
   "command.switchProvider": "AI Commit: Switch Provider/Model",

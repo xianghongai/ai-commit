@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
-import test from 'node:test';
-import { isPathInside, selectRepositoryByPath } from '../repository-utils';
+import { test } from 'vitest';
+import { isPathInside, selectRepositoryByPath } from '@/repository-utils';
 
 test('does not treat sibling paths with the same prefix as nested repositories', () => {
   assert.equal(isPathInside('/work/app', '/work/app-backup'), false);
